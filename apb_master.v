@@ -5,6 +5,7 @@ module apb_master (
   psel,
   penable,
   pwdata,
+  prdata,
   pready);
 
   input pclk;
@@ -13,7 +14,13 @@ module apb_master (
   output reg psel;
   output reg penable;
   output reg [7:0] pwdata;
+  output reg [7:0] prdata;
   input pready;
+  reg ren, wen;
+  
+  assign wen = psel & penable & pwrite;
+  assign ren = psel & penable & !pwrite;
+  assign prdata = ren ? test_rd_data : 0;
 
   task wait4clk(integer n);
   begin
@@ -35,12 +42,32 @@ module apb_master (
     psel = 0;
   end
   endtask
+
+  reg [7:0] test_rd_data;
+  initial begin
+    test_rd_data = 55;
+  end
+
+  task apb_read(input [3:0] addr);
+  begin
+    pwrite = 0;
+    psel = 1;
+    penable = 0;
+    paddr = addr;
+    wait4clk(1);
+    penable = 1;
+    wait4clk(1);
+    $display("Read data: %d", test_rd_data++);
+    psel = 0;
+  end
+  endtask
 endmodule
 
 `define PERIOD 10
 
 module tb();
   logic clk;
+  reg [7:0] prdata;
 
   initial begin
     clk = 0;
@@ -61,6 +88,14 @@ module tb();
     apb_m.apb_write(4,5);
     apb_m.wait4clk(1);
     apb_m.apb_write(5,10);
+    apb_m.wait4clk(1);
+    apb_m.apb_read(1);
+    apb_m.wait4clk(1);
+    apb_m.apb_read(2);
+    apb_m.wait4clk(1);
+    apb_m.apb_read(3);
+    apb_m.wait4clk(1);
+    apb_m.apb_read(4);
     apb_m.wait4clk(2);
     $finish;
   end
