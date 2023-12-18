@@ -1,5 +1,8 @@
+`define PERIOD 10
+
 module apb_master (
   pclk,
+  rst_n,
   paddr,
   pwrite,
   psel,
@@ -9,23 +12,28 @@ module apb_master (
   pready);
 
   input pclk;
+  output reg rst_n;
   output reg [3:0] paddr;
   output reg pwrite;
   output reg psel;
   output reg penable;
   output reg [7:0] pwdata;
-  output reg [7:0] prdata;
+  input reg [7:0] prdata;
   input pready;
-  reg ren, wen;
   
-  assign wen = psel & penable & pwrite;
-  assign ren = psel & penable & !pwrite;
-  assign prdata = ren ? test_rd_data : 0;
-
   task wait4clk(integer n);
   begin
     repeat (n)
       @(posedge pclk);
+  end
+  endtask
+
+  task reset;
+  begin
+    rst_n = 0;
+    wait4clk(4);
+    rst_n = 1;
+    wait4clk(2);
   end
   endtask
 
@@ -39,14 +47,12 @@ module apb_master (
     wait4clk(1);
     penable = 1;
     wait4clk(1);
+    while (!pready)
+    	wait4clk(1);
     psel = 0;
+    penable = 0;
   end
   endtask
-
-  reg [7:0] test_rd_data;
-  initial begin
-    test_rd_data = 55;
-  end
 
   task apb_read(input [3:0] addr);
   begin
@@ -57,17 +63,25 @@ module apb_master (
     wait4clk(1);
     penable = 1;
     wait4clk(1);
-    $display("Read data: %d", test_rd_data++);
+    while (!pready)
+    	wait4clk(1);
+    $display("Read data: %d", prdata);
+    penable = 0;
     psel = 0;
   end
   endtask
 endmodule
 
-`define PERIOD 10
-
 module tb();
-  logic clk;
+  logic clk, sclk;
+  logic rst_n;
+  reg [3:0] paddr;
+  logic pwrite;
+  logic psel;
+  logic penable;
+  reg [7:0] pwdata;
   reg [7:0] prdata;
+  logic pready;
 
   initial begin
     clk = 0;
@@ -75,26 +89,65 @@ module tb();
       #(`PERIOD/2) clk = ~clk;
   end
 
-  apb_master apb_m(.pclk(clk));
+  assign #0 sclk = clk;
+
+  apb_master apb_m(
+    .pclk(clk),
+    .rst_n(rst_n),
+    .paddr(paddr),
+    .pwrite(pwrite),
+    .psel(psel),
+    .penable(penable),
+    .pwdata(pwdata),
+    .prdata(prdata),
+    .pready(pready)
+  );
+
+  apb_slave apb_s(
+    .pclk(sclk),
+    .rst_n(rst_n),
+    .paddr(paddr),
+    .pwrite(pwrite),
+    .psel(psel),
+    .penable(penable),
+    .pwdata(pwdata),
+    .prdata(prdata),
+    .pready(pready)
+  );
 
   initial begin
     $dumpfile("tb.vcd");
     $dumpvars(0,tb);
+    apb_m.reset();
     apb_m.wait4clk(2);
     apb_m.apb_write(2,5);
-    apb_m.wait4clk(1);
+    `ifdef GAPCLK
+      apb_m.wait4clk(1);
+    `endif
     apb_m.apb_write(3,10);
-    apb_m.wait4clk(1);
+    `ifdef GAPCLK
+      apb_m.wait4clk(1);
+    `endif
     apb_m.apb_write(4,5);
-    apb_m.wait4clk(1);
+    `ifdef GAPCLK
+      apb_m.wait4clk(1);
+    `endif
     apb_m.apb_write(5,10);
-    apb_m.wait4clk(1);
+    `ifdef GAPCLK
+      apb_m.wait4clk(1);
+    `endif
     apb_m.apb_read(1);
-    apb_m.wait4clk(1);
+    `ifdef GAPCLK
+      apb_m.wait4clk(1);
+    `endif
     apb_m.apb_read(2);
-    apb_m.wait4clk(1);
+    `ifdef GAPCLK
+      apb_m.wait4clk(1);
+    `endif
     apb_m.apb_read(3);
-    apb_m.wait4clk(1);
+    `ifdef GAPCLK
+      apb_m.wait4clk(1);
+    `endif
     apb_m.apb_read(4);
     apb_m.wait4clk(2);
     $finish;
