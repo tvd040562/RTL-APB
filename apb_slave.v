@@ -17,6 +17,7 @@ module apb_memory (
   input [7:0] pwdata;
   output [7:0] prdata;
 
+  `ifndef USE_RAM_MODEL
   reg [7:0] mem[16];
   reg write_data;
 
@@ -33,6 +34,18 @@ module apb_memory (
       write_data = 0;
     end
   end
+  `else
+    sky130_sram_16byte_1r1w u_ram
+      (.clk0(pclk),
+       .csb0(!wen),
+       .addr0(paddr),
+       .din0(pwdata),
+       .clk1(pclk),
+       .csb1(!ren),
+       .addr1(paddr),
+       .dout1(prdata)
+     );
+   `endif
 
 endmodule
 

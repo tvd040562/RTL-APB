@@ -65,6 +65,8 @@ module apb_master (
     wait4clk(1);
     while (!pready)
     	wait4clk(1);
+    `ifdef USE_RAM_MODEL
+      wait4clk(1);
     $display("Read data: %d", prdata);
     penable = 0;
     psel = 0;
