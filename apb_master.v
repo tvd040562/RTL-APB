@@ -136,10 +136,6 @@ module tb();
     `ifdef GAPCLK
       apb_m.wait4clk(1);
     `endif
-    apb_m.apb_read(1);
-    `ifdef GAPCLK
-      apb_m.wait4clk(1);
-    `endif
     apb_m.apb_read(2);
     `ifdef GAPCLK
       apb_m.wait4clk(1);
@@ -149,6 +145,10 @@ module tb();
       apb_m.wait4clk(1);
     `endif
     apb_m.apb_read(4);
+    `ifdef GAPCLK
+      apb_m.wait4clk(1);
+    `endif
+    apb_m.apb_read(5);
     apb_m.wait4clk(2);
     $finish;
   end
