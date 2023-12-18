@@ -1,0 +1,13 @@
+{
+    "DESIGN_NAME": "apb_slave",
+    "VERILOG_FILES": "dir::apb_slave.v",
+    "CLOCK_PORT": "pclk",
+    "CLOCK_PERIOD": 6.5,
+    "PNR_SDC_FILE": "dir::top.sdc",
+    "SIGNOFF_SDC_FILE": "dir::top.sdc",
+    "DESIGN_IS_CORE": true,
+    "IO_DELAY_CONSTRAINT": 0.1,
+    "MAX_FANOUT_CONSTRAINT": 6,
+    "MAX_TRANSITION_CONSTRAINT": 1.0,
+    "RUN_LINTER":0
+}
