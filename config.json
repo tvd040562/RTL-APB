@@ -2,12 +2,46 @@
     "DESIGN_NAME": "apb_slave",
     "VERILOG_FILES": "dir::apb_slave.v",
     "CLOCK_PORT": "pclk",
-    "CLOCK_PERIOD": 6.5,
+    "CLOCK_PERIOD": 5.0,
     "PNR_SDC_FILE": "dir::top.sdc",
     "SIGNOFF_SDC_FILE": "dir::top.sdc",
     "DESIGN_IS_CORE": true,
-    "IO_DELAY_CONSTRAINT": 0.1,
-    "MAX_FANOUT_CONSTRAINT": 6,
+    "FP_PDN_CORE_RING": 1,
+    "FP_SIZING": "absolute",
+    "DIE_AREA": [
+	    0,
+	    0,
+	    250,
+	    250
+    ],
+    "MACROS": {
+        "apb_memory": {
+            "instances": {
+                "u_mem": {
+                    "location": [50, 50],
+                    "orientation": "N"
+                }
+            },
+            "lib": {
+                "*": ["dir::macro/lib/nom_tt_025C_1v80/apb_memory__nom_tt_025C_1v80.lib"]
+                },
+            "gds": [
+                "dir::macro/gds/apb_memory.gds"
+            ],
+            "lef": [
+                "dir::macro/lef/apb_memory.lef"
+            ]
+        }
+    },
+    "VDD_NETS": "vccd1",
+    "GND_NETS": "vssd1",
+    "PDN_MACRO_CONNECTIONS": ["u_mem vccd1 vssd1 vccd1 vssd1"],
+    "RUN_KLAYOUT_XOR": false,
+    "MAGIC_DRC_USE_GDS": false,
+    "QUIT_ON_MAGIC_DRC": false,
+    "IO_DELAY_CONSTRAINT": 0.08,
+    "MAX_FANOUT_CONSTRAINT": 10,
     "MAX_TRANSITION_CONSTRAINT": 1.0,
+    "QUIT_ON_XOR_ERROR": 0,
     "RUN_LINTER":0
 }

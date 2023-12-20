@@ -1,0 +1,27 @@
+{
+    "DESIGN_NAME": "apb_memory",
+    "VERILOG_FILES": "dir::macro_rtl/apb_memory.v",
+    "CLOCK_PORT": "pclk",
+    "CLOCK_PERIOD": 5.0,
+    "PNR_SDC_FILE": "dir::macro.sdc",
+    "SIGNOFF_SDC_FILE": "dir::macro.sdc",
+    "DESIGN_IS_CORE": false,
+    "FP_SIZING": "absolute",
+    "DIE_AREA": [
+	    0,
+	    0,
+	    150,
+	    150
+    ],
+    "PL_TARGET_DENSITY_PCT": 50,
+    "IO_DELAY_CONSTRAINT": 0.1,
+    "FP_PDN_CORE_RING": false,
+    "VDD_NETS": "vccd1 vccd1",
+    "GND_NETS": "vssd1 vssd1",
+    "RUN_CTS": 0,
+    "RT_MAX_LAYER": "met4",
+    "MAX_FANOUT_CONSTRAINT": 10,
+    "MAX_TRANSITION_CONSTRAINT": 1.0,
+    "QUIT_ON_XOR_ERROR": 1,
+    "RUN_LINTER":0
+}
